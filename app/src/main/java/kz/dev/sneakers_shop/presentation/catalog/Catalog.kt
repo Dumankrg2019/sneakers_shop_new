@@ -1,5 +1,6 @@
 package kz.dev.sneakers_shop.presentation.catalog
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,12 +47,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kz.dev.sneakers_shop.R
+import kz.dev.sneakers_shop.data.Shoes.listOfSneakers
 import kz.dev.sneakers_shop.data.Sneakers
 import kz.dev.sneakers_shop.ui.theme.GreyBackground
 import kz.dev.sneakers_shop.ui.theme.GreyText
 
 @Composable
-fun Catalog() {
+fun Catalog(clickOnShoes: () -> Unit, addShoesOnDb: (Int)-> Unit) {
     Column(
         modifier = Modifier
             .safeContentPadding()
@@ -64,7 +66,7 @@ fun Catalog() {
     ) {
         HeaderCatalog()
         Spacer(modifier = Modifier.height(20.dp))
-        ListSneakers()
+        ListSneakers(clickOnShoes, addShoesOnDb)
     }
 }
 
@@ -83,7 +85,8 @@ private fun  HeaderCatalog() {
 }
 
 @Composable
-private fun SneakersCard(listShoes: Sneakers) {
+private fun SneakersCard(listShoes: Sneakers, clickOnShoes: () -> Unit,
+                         addShoesOnDb:(Int)-> Unit) {
     var isBasket by remember {
         mutableStateOf(false)
     }
@@ -150,6 +153,9 @@ private fun SneakersCard(listShoes: Sneakers) {
                         .alpha(if(isBasket) 0.7f else 1f),
                     onClick = {
                         isBasket = !isBasket
+                        clickOnShoes()
+                        Log.e("dd", "clicked: ${listShoes.id}")
+                        addShoesOnDb(listShoes.id)
                     },
                     shape = RoundedCornerShape(32.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -175,63 +181,7 @@ private fun SneakersCard(listShoes: Sneakers) {
 }
 
 @Composable
-private fun ListSneakers() {
-    val listOfSneakers = listOf(
-        Sneakers(
-            "Dolce & Gabbana",
-            R.drawable.shoes_dolce,
-            "Кеды с принтом граффити",
-            1251.0
-        ),
-        Sneakers(
-            "Off-White-Pink",
-            R.drawable.shoes_pink,
-            "Кроссовки Off-Court-Pink 3.0",
-            551.0
-        ),
-        Sneakers(
-            "Anime shoes",
-            R.drawable.shoes_white,
-            "Анимэшная обувь",
-            396.0
-        ),
-        Sneakers(
-            "Arrow fashion",
-            R.drawable.shoes_white_arrow,
-            "Кроссовки Off-Court 3.0",
-            741.0
-        ),
-        Sneakers(
-            "Jordan",
-            R.drawable.shoes_jordan,
-            "Кеды с принтом граффити",
-            1654.0
-        ),
-        Sneakers(
-            "Jordan Brown",
-            R.drawable.shoes_brown_jordan,
-            "Баскетбольные Jordan",
-            1830.0
-        ),
-        Sneakers(
-            "New Balance",
-            R.drawable.shoes_gray,
-            "Кроссовки 993 Brown из коллаборации с Aimé Leon Dore",
-            1120.0
-        ),
-        Sneakers(
-            "Martini shoes",
-            R.drawable.shoes_brown_orange,
-            "Лучшая коллекция Martini shoes",
-            2530.0
-        ),
-        Sneakers(
-            "Standart black shoes",
-            R.drawable.shoes_black,
-            "Comfotable and usefull for everyday",
-            400.0
-        ),
-    )
+private fun ListSneakers(clickOnShoes: ()-> Unit, addShoesOnDb:(Int)-> Unit) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -239,7 +189,7 @@ private fun ListSneakers() {
         contentPadding = PaddingValues(bottom = 10.dp)
     ) {
         items(listOfSneakers) {item->
-            SneakersCard(item)
+            SneakersCard(item, clickOnShoes, addShoesOnDb)
         }
     }
 }
@@ -247,5 +197,5 @@ private fun ListSneakers() {
 @Preview (showBackground = true)
 @Composable
 fun Preview() {
-    Catalog()
+    //Catalog()
 }

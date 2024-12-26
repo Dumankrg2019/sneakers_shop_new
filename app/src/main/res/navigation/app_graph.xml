@@ -18,5 +18,13 @@
         android:id="@+id/catalogFragment"
         android:name="kz.dev.sneakers_shop.presentation.CatalogFragment"
         android:label="fragment_catalog"
-        tools:layout="@layout/fragment_catalog" />
+        tools:layout="@layout/fragment_catalog" >
+        <action
+            android:id="@+id/action_catalogFragment_to_cartFragment"
+            app:destination="@id/cartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="kz.dev.sneakers_shop.presentation.cart.CartFragment"
+        android:label="CartFragment" />
 </navigation>

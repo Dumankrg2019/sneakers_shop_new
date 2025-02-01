@@ -53,7 +53,8 @@ import kz.dev.sneakers_shop.ui.theme.GreyBackground
 import kz.dev.sneakers_shop.ui.theme.GreyText
 
 @Composable
-fun Catalog(clickOnShoes: () -> Unit, addShoesOnDb: (Int)-> Unit) {
+fun Catalog(clickOnShoes: () -> Unit, addShoesOnDb: (Int)-> Unit,
+            onRemoveItem: (Int)-> Unit) {
     Column(
         modifier = Modifier
             .safeContentPadding()
@@ -66,7 +67,7 @@ fun Catalog(clickOnShoes: () -> Unit, addShoesOnDb: (Int)-> Unit) {
     ) {
         HeaderCatalog()
         Spacer(modifier = Modifier.height(20.dp))
-        ListSneakers(clickOnShoes, addShoesOnDb)
+        ListSneakers(clickOnShoes, addShoesOnDb, onRemoveItem)
     }
 }
 
@@ -86,7 +87,8 @@ private fun  HeaderCatalog() {
 
 @Composable
 private fun SneakersCard(listShoes: Sneakers, clickOnShoes: () -> Unit,
-                         addShoesOnDb:(Int)-> Unit) {
+                         addShoesOnDb:(Int)-> Unit,
+                         onRemoveItem: (Int)-> Unit) {
     var isBasket by remember {
         mutableStateOf(false)
     }
@@ -152,10 +154,15 @@ private fun SneakersCard(listShoes: Sneakers, clickOnShoes: () -> Unit,
                         .height(36.dp)
                         .alpha(if(isBasket) 0.7f else 1f),
                     onClick = {
+                        if(isBasket) {
+                            onRemoveItem(listShoes.id)
+                        } else {
+                            addShoesOnDb(listShoes.id)
+                        }
                         isBasket = !isBasket
-                        clickOnShoes()
+                        //clickOnShoes()
                         Log.e("dd", "clicked: ${listShoes.id}")
-                        addShoesOnDb(listShoes.id)
+
                     },
                     shape = RoundedCornerShape(32.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -181,7 +188,8 @@ private fun SneakersCard(listShoes: Sneakers, clickOnShoes: () -> Unit,
 }
 
 @Composable
-private fun ListSneakers(clickOnShoes: ()-> Unit, addShoesOnDb:(Int)-> Unit) {
+private fun ListSneakers(clickOnShoes: ()-> Unit, addShoesOnDb:(Int)-> Unit,
+                         onRemoveItem: (Int)-> Unit ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -189,7 +197,7 @@ private fun ListSneakers(clickOnShoes: ()-> Unit, addShoesOnDb:(Int)-> Unit) {
         contentPadding = PaddingValues(bottom = 10.dp)
     ) {
         items(listOfSneakers) {item->
-            SneakersCard(item, clickOnShoes, addShoesOnDb)
+            SneakersCard(item, clickOnShoes, addShoesOnDb, onRemoveItem)
         }
     }
 }

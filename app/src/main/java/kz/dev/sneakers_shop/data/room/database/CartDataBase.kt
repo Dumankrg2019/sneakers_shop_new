@@ -5,12 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import kz.dev.sneakers_shop.data.room.dao.CartDao
+import kz.dev.sneakers_shop.data.room.dao.UsersDao
 import kz.dev.sneakers_shop.data.room.entities.Cart
+import kz.dev.sneakers_shop.data.room.entities.Users
 
 
-@Database(entities = [Cart::class], version = 1)
+@Database(entities = [Cart::class, Users::class], version = 2)
 abstract class CartDataBase: RoomDatabase() {
     abstract fun getItemsCart(): CartDao
+    abstract fun getItemUser(): UsersDao
 }
 
 object DatabaseHolder {

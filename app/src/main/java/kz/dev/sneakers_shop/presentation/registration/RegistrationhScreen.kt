@@ -1,4 +1,4 @@
-package kz.dev.sneakers_shop.presentation.auth
+package kz.dev.sneakers_shop.presentation.registration
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,16 +46,21 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kz.dev.sneakers_shop.R
+import kz.dev.sneakers_shop.data.room.entities.Users
+import kz.dev.sneakers_shop.presentation.auth.Header
 import kz.dev.sneakers_shop.ui.theme.GreyBackground
 import kz.dev.sneakers_shop.ui.theme.GreyText
 
 @Composable
-fun Authentication(
-    state: State<AuthScreenState>,
-    onEvent: (AuthScreenEvent) -> Unit) {
+fun RegistrationScreen(authIn: () -> Unit, addUser: (login: String, password: String) -> Unit) {
+
+    val usersState = remember {
+        mutableStateOf(Pair("", ""))
+    }
 
     Column(
         modifier = Modifier
@@ -66,13 +74,13 @@ fun Authentication(
     ) {
         Header()
         Spacer(modifier = Modifier.height(52.dp))
-        LoginField()
+        LoginField(usersState)
         Spacer(modifier = Modifier.height(16.dp))
-        PasswordField()
+        PasswordField(usersState)
+        Spacer(modifier = Modifier.height(16.dp))
+        RepeatPasswordField()
         Spacer(modifier = Modifier.weight(1f))
-        ButtonSignUp(onEvent)
-        Spacer(modifier = Modifier.height(16.dp))
-        ButtonSignIn(signIn, checkCredentials)
+        ButtonSignIn(authIn, addUser, usersState)
 
     }
 }
@@ -103,7 +111,7 @@ fun Header() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LoginField() {
+private fun LoginField(usersState: MutableState<Pair<String, String>>) {
     var userName by remember {
         mutableStateOf("")
     }
@@ -137,6 +145,7 @@ private fun LoginField() {
         value = userName,
         onValueChange = {
             userName = it
+            usersState.value = usersState.value.copy(first = it)
         },
         placeholder = {
             Text(
@@ -157,14 +166,17 @@ private fun LoginField() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PasswordField() {
+private fun PasswordField(usersState: MutableState<Pair<String, String>>) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordFocus by remember { mutableStateOf(false) }
 
     TextField(
         value = password,
-        onValueChange = { password = it },
+        onValueChange = {
+            password = it
+            usersState.value = usersState.value.copy(second = it)
+                        },
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp))
@@ -217,42 +229,75 @@ private fun PasswordField() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ButtonSignIn(signIn: () -> Unit,
-                         checkCredentials: (login: String, password: String) -> Unit) {
-    Button(
+private fun RepeatPasswordField() {
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var passwordFocus by remember { mutableStateOf(false) }
+
+    TextField(
+        value = password,
+        onValueChange = { password = it },
         modifier = Modifier
             .fillMaxWidth()
-            .height(54.dp),
-        onClick = {
-            signIn()
-        },
-        shape = RoundedCornerShape(32.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black
-        ),
-    ) {
-        Text(
-            text = stringResource(R.string.sign_in),
-            style = TextStyle(
-                color = Color.White,
-                fontSize = 17.sp,
-                fontWeight = FontWeight(600),
-                lineHeight = 22.sp,
+            .clip(RoundedCornerShape(4.dp))
+            .onFocusChanged { focus ->
+                passwordFocus = focus.isFocused
+            }
+            .border(
+                width = if (passwordFocus) 2.dp else 0.dp,
+                color = if (passwordFocus) Color.Black else Color.Transparent,
+                shape = if (passwordFocus) RoundedCornerShape(4.dp) else RoundedCornerShape(0.dp)
             ),
-            textAlign = TextAlign.Center
-        )
-    }
+        placeholder = {
+            Text(
+                text = stringResource(R.string.repeat_password),
+                style = TextStyle(
+                    color = GreyText,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(400),
+                    lineHeight = 21.sp,
+                ),
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        maxLines = 1,
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        trailingIcon = {
+            if(passwordFocus && password.isNotEmpty()) {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                    )
+                }
+            }
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = GreyBackground,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        textStyle = TextStyle(
+            color = Color.Black,
+            fontSize = 20.sp,
+            fontWeight = FontWeight(600),
+            lineHeight = 24.sp,
+        ),
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ButtonSignUp(onEvent: (AuthScreenEvent) -> Unit) {
+private fun ButtonSignIn(signIn: () -> Unit, addUser: (login: String, password: String) -> Unit,
+                         user: MutableState<Pair<String, String>>) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
-            .height(54.dp),
+            .heightIn(min = 54.dp),
         onClick = {
-            onEvent.invoke()
+            addUser(user.value.first, user.value.second)
+            signIn()
         },
         shape = RoundedCornerShape(32.dp),
         colors = ButtonDefaults.buttonColors(
@@ -272,3 +317,8 @@ private fun ButtonSignUp(onEvent: (AuthScreenEvent) -> Unit) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    RegistrationScreen(authIn = {}, addUser = {  _, _ -> })
+}

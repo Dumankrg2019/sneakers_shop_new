@@ -27,6 +27,7 @@
         android:background="@color/white"
         app:itemIconTint="@drawable/nav_bottom_item_color_state"
         app:itemTextColor="@drawable/nav_bottom_item_color_state"
-        app:menu="@menu/bottom_nav">
+        app:menu="@menu/bottom_nav"
+        android:fitsSystemWindows="true">
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 </androidx.constraintlayout.widget.ConstraintLayout>

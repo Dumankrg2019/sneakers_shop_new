@@ -1,5 +1,38 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.HomeWorkXml" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
 
-    <style name="Theme.Sneakers_shop" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.HomeWorkXml" parent="Base.Theme.HomeWorkXml" />
+
+    <style name="TitleText">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/blackTextTitle</item>
+    </style>
+    <style name="MiddleText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/greyTextTitle</item>
+    </style>
+
+    <style name="MiddleTitleText">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/blackTextTitle</item>
+    </style>
+
+    <style name="TinyText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/blackTextTitle</item>
+    </style>
+
+    <style name="TinyGreyText">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/greyTextTitle</item>
+    </style>
 </resources>

@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "sneakers_shop"
+rootProject.name = "HomeWorkXml"
 include(":app")
  
